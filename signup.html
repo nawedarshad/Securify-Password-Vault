@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Securify Password Manager - Signup</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #container {
+            background-color: #1E1E1E;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            color: #ffffff;
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #333;
+            background-color: #fff;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .signup-link {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        a {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h2>Create an Account</h2>
+    <form id="signup-form">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+        <button type="button" onclick="signup()">Sign Up</button>
+    </form>
+    <div class="signup-link">
+        Already have an account? <a href="login.html">Log in</a>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function signup() {
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirm-password').value;
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match. Please try again.');
+            return;
+        }
+
+        // Make AJAX request to your backend for signup
+        // Example using jQuery AJAX
+        $.ajax({
+            type: 'POST',
+            url: 'signup.php',
+            data: {
+                action: 'signup',
+                username: username,
+                password: password
+            },
+            success: function (response) {
+                if (response === 'success') {
+                    alert('Signup successful! You can now log in.');
+                    window.location.href = 'login.html'; // Redirect to login page
+                } else {
+                    alert('Signup failed. Please try again.');
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

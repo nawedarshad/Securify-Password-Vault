@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager - Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Google Fonts - Poppins -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Add these styles in the head section of your HTML file -->
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            /* Light gray background */
+        }
+
+        #container {
+            display: flex;
+            background-color: #fff;
+            /* White container background */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin: 20px;
+            overflow: hidden;
+            height: 90vh;
+        }
+
+        #options {
+            background-color: #4CAF50;
+            /* Green sidebar background */
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            
+        }
+
+        #content {
+            flex-grow: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            background-color: #fff;
+            /* White content background */
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            /* Green button background */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            /* Darker green on hover */
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 20px;
+            animation: slideInUp 1s ease-in-out;
+        }
+
+        .input-container label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .input-container input {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .output-container {
+            margin-top: 20px;
+            text-align: left;
+            animation: fadeInUp 1s ease-in-out;
+        }
+
+        /* Updated styling for password strength feedback */
+        #strength-menu,
+        #strong-menu,
+        #password-generator {
+            background-color: #4CAF50;
+            /* Green background for password-related sections */
+            color: white;
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid #eee;
+            box-sizing: border-box;
+            display: none;
+            border-radius: 8px;
+        }
+
+        .generated-password {
+            font-weight: bold;
+            margin-top: 10px;
+            color: white;
+        }
+
+        #card-section {
+            display: none;
+            /* Hide the card section by default */
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100px);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        #note-section {
+            display: none; /* Hide the note section by default */
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="container">
+        <div id="options">
+            <h2>Password Manager</h2>
+            <button onclick="viewAllCredentials()"><i class="fas fa-list"></i> All Credentials</button>
+            <button onclick="showinput('login')"><i class="fas fa-key"></i> Login</button>
+            <button onclick="storeCreditCard()"><i class="fas fa-credit-card"></i> Card Details</button>
+            <button onclick="storeSecureNote()"><i class="fas fa-sticky-note"></i> Secure Notes</button>
+            <button onclick="openPasswordGenerator()"><i class="fas fa-cogs"></i> Password Generator</button>
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+        <div id="content">
+            <div id="content">
+                <div id="note-section" class="input-container">
+                    <h2>Add Secure Note</h2>
+                    <label for="note-title">Note Title:</label>
+                    <input type="text" id="note-title" class="form-control" placeholder="Enter note title">
+    
+                    <label for="note-content">Note Content:</label>
+                    <textarea id="note-content" class="form-control" placeholder="Enter note content"></textarea>
+    
+                    <button class="btn btn-success" onclick="storeSecureNote()">Save Secure Note</button>
+                </div>
+            <div class="input-container" id="input_cont">
+                <h2>Store Credentials</h2>
+                <label for="label">Label:</label>
+                <input type="text" id="label" class="form-control" placeholder="Enter a label">
+                <label for="username">Username:</label>
+                <input type="text" id="username" class="form-control" placeholder="Enter a username">
+                <label for="password">Password:</label>
+                <input type="password" id="password" class="form-control" placeholder="Enter a password">
+                <button class="btn btn-success" onclick="storeCredentials()">Store Credentials</button>
+                <span id="password-strength-feedback"></span>
+            </div>
+            <div id="card-section" class="input-container">
+                <h2>Add Credit Card</h2>
+                <label for="card-name">Card Name:</label>
+                <input type="text" id="card-name" class="form-control" placeholder="Enter card name">
+
+                <label for="card-holder-name">Cardholder Name:</label>
+                <input type="text" id="card-holder-name" class="form-control" placeholder="Enter cardholder name">
+
+                <label for="card-brand">Brand:</label>
+                <input type="text" id="card-brand" class="form-control" placeholder="Enter card brand">
+
+                <label for="card-number">Card Number:</label>
+                <input type="text" id="card-number" class="form-control" placeholder="Enter card number">
+
+                <label for="expiration-month">Expiration Month:</label>
+                <select id="expiration-month" class="form-control">
+                    <option value="" disabled selected>-- Select --</option>
+                    <option value="1">01</option>
+                    <option value="2">02</option>
+                    <option value="3">03</option>
+                    <option value="4">04</option>
+                    <option value="5">05</option>
+                    <option value="6">06</option>
+                    <option value="7">07</option>
+                    <option value="8">08</option>
+                    <option value="9">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
+
+                <label for="expiration-year">Expiration Year:</label>
+                <select id="expiration-year" class="form-control">
+                    <option value="" disabled selected>-- Select --</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+
+                <label for="security-code">Security Code (CVV):</label>
+                <input type="text" id="security-code" class="form-control" placeholder="Enter CVV">
+
+                <button class="btn btn-success" onclick="storeCreditCard()">Save Credit Card</button>
+            </div>
+            
+            <div id="strength-menu">
+                <h2>Password Strength</h2>
+                <div class="password-strength" id="password-strength-container">
+                    <label for="password-strength">Strength:</label>
+                    <progress id="password-strength" class="form-control" value="0" max="100"></progress>
+                    <span id="password-strength-text"></span>
+                </div>
+            </div>
+            <div id="strong-menu">
+                <h2>Strong Password Recommendation</h2>
+                <p>Your password is strong! Good job! Make sure to remember it.</p>
+            </div>
+            <!-- Password Generator Section -->
+            <div id="password-generator">
+                <h2>Password Generator</h2>
+                <div id="password-generator-options">
+
+
+
+                    <div class="form-group">
+                        <label for="length">Length:</label>
+                        <input type="number" class="form-control" id="length" min="5" value="14">
+                        <!-- Set a default value -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min-length">Minimum password length:</label>
+                        <input type="number" class="form-control" id="min-length" min="5" value="14">
+                        <!-- Set a default value -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min-numbers">Minimum numbers:</label>
+                        <input type="number" class="form-control" id="min-numbers" min="0" value="1">
+                        <!-- Set a default value -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min-special">Minimum special characters:</label>
+                        <input type="number" class="form-control" id="min-special" min="0" value="1">
+                        <!-- Set a default value -->
+                    </div>
+
+                    <div class="form-group">
+                        <label>Options:</label>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="option-uppercase" checked>
+                            <label class="form-check-label" for="option-uppercase">Include Uppercase (A-Z)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="option-lowercase" checked>
+                            <label class="form-check-label" for="option-lowercase">Include Lowercase (a-z)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="option-numbers" checked>
+                            <label class="form-check-label" for="option-numbers">Include Numbers (0-9)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="option-special" checked>
+                            <label class="form-check-label" for="option-special">Include Special Characters
+                                (!@#$%^&*)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="option-avoid-ambiguous" checked>
+                            <label class="form-check-label" for="option-avoid-ambiguous">Avoid Ambiguous
+                                Characters</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-danger" onclick="generatePassword()">Generate Password</button>
+                <div class="generated-password" id="generated-password"></div>
+            </div>
+
+
+            <!-- Output will be displayed here -->
+            <div class="output-container"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Font Awesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        // Add this line at the beginning of your script
+        let currentCategory = null;
+
+        // Existing functions remain unchanged
+        function storeSecureNote() {
+            $("#note-section").show();
+            $("#input_cont").hide();
+            $("#card-section").hide();
+            // Retrieve secure note information from the form
+            let noteTitle = $("#note-title").val();
+            let noteContent = $("#note-content").val();
+
+            // Perform validation if needed
+
+            // Send the secure note information to the server for storage
+            $.ajax({
+                type: 'POST',
+                url: 'backend.php',
+                data: {
+                    action: 'storeSecureNote',
+                    noteTitle: noteTitle,
+                    noteContent: noteContent
+                },
+                success: function (response) {
+                    if (response === 'success') {
+                        alert('Secure note stored successfully.');
+                        // You may want to reset the form or perform other actions here
+                    } else {
+                        alert('Storage failed. Please try again.');
+                    }
+                }
+            });
+        }
+
+        function storeCreditCard() {
+            // Retrieve credit card information from the form
+            $("#input_cont").hide();
+            $("#card-section").show();
+            let cardName = $("#card-name").val();
+            let folder = $("#card-folder").val();
+            let cardholderName = $("#card-holder-name").val();
+            let cardBrand = $("#card-brand").val();
+            let cardNumber = $("#card-number").val();
+            let expirationMonth = $("#expiration-month").val();
+            let expirationYear = $("#expiration-year").val();
+            let securityCode = $("#security-code").val();
+
+            // Perform validation if needed
+
+            // Send the credit card information to the server for storage
+            $.ajax({
+                type: 'POST',
+                url: 'backend.php',
+                data: {
+                    action: 'storeCreditCard',
+                    cardName: cardName,
+                    folder: folder,
+                    cardholderName: cardholderName,
+                    cardBrand: cardBrand,
+                    cardNumber: cardNumber,
+                    expirationMonth: expirationMonth,
+                    expirationYear: expirationYear,
+                    securityCode: securityCode
+                },
+                success: function (response) {
+                    if (response === 'success') {
+                        alert('Credit card information stored successfully.');
+                        // You may want to reset the form or perform other actions here
+                    } else {
+                        alert('Storage failed. Please try again.');
+                    }
+                }
+            });
+        }
+
+
+        function generatePassword() {
+            $("#input_cont").hide();
+
+            const passwordType = $("#password-type").val();
+            const length = parseInt($("#length").val());
+            const minLength = parseInt($("#min-length").val());
+            const minNumbers = parseInt($("#min-numbers").val());
+            const minSpecial = parseInt($("#min-special").val());
+            const includeUppercase = $("#option-uppercase").is(":checked");
+            const includeLowercase = $("#option-lowercase").is(":checked");
+            const includeNumbers = $("#option-numbers").is(":checked");
+            const includeSpecial = $("#option-special").is(":checked");
+            const avoidAmbiguous = $("#option-avoid-ambiguous").is(":checked");
+
+            let charset = "";
+
+            if (includeUppercase) {
+                charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            }
+
+            if (includeLowercase) {
+                charset += "abcdefghijklmnopqrstuvwxyz";
+            }
+
+            if (includeNumbers) {
+                charset += "0123456789";
+            }
+
+            if (includeSpecial) {
+                charset += "!@#$%^&*()_-+=";
+            }
+
+            if (avoidAmbiguous) {
+                // Remove ambiguous characters (e.g., l, 1, I, o, 0, O)
+                charset = charset.replace(/[l1Io0O]/g, "");
+            }
+
+            let generatedPassword = "";
+
+            if (passwordType === "password") {
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(Math.random() * charset.length);
+                    generatedPassword += charset[randomIndex];
+                }
+            } else if (passwordType === "passphrase") {
+                // Implement passphrase generation logic based on specified options
+                // This is a placeholder, and you can replace it with your own logic
+                generatedPassword = "Passphrase123"; // Replace with your logic
+            }
+
+            // Display the generated password
+            $("#generated-password").text("Generated Password: " + generatedPassword);
+        }
+
+
+        // Existing functions remain unchanged
+
+
+        function showPasswordStrengthMenu() {
+            $("#strength-menu").removeClass("hidden");
+        }
+        function showinput(category) {
+            $("#input_cont").show();
+            hidePasswordGenerator();
+            // Set the current category
+            currentCategory = category;
+        }
+        hidePasswordGenerator();
+
+        function hidePasswordStrengthMenu() {
+            $("#strength-menu").addClass("hidden");
+        }
+
+        function hideStoreSection() {
+            $("#input_cont").addClass("hidden");
+        }
+
+        function hideStrongPasswordMenu() {
+            $("#strong-menu").addClass("hidden");
+        }
+
+        function openPasswordGenerator() {
+            // Hide other sections
+            hidePasswordStrengthMenu();
+            hideStoreSection();
+            hideStrongPasswordMenu();
+
+            // Hide the input-container
+            $("#input_cont").hide();
+
+            // Show the password generator section
+            $("#password-generator").show();
+        }
+
+        function hidePasswordGenerator() {
+            // Hide the password generator section
+            $("#password-generator").hide();
+
+            // Show the input-container
+            $("#input_cont").show();
+        }
+
+        // Password strength calculation function
+        function calculatePasswordStrength(password) {
+            // Implement your password strength calculation logic here
+            // For example, you can check length, use of uppercase, lowercase, digits, and symbols
+            let strength = 0;
+
+            // Example: Check if the password contains at least 8 characters
+            if (password.length >= 8) {
+                strength += 25;
+            }
+
+            // Example: Check if the password contains uppercase and lowercase characters
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
+                strength += 25;
+            }
+
+            // Example: Check if the password contains digits
+            if (/\d/.test(password)) {
+                strength += 25;
+            }
+
+            // Example: Check if the password contains symbols
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                strength += 25;
+            }
+
+            return strength;
+        }
+
+        // Update the password strength feedback
+        function updatePasswordStrength(password) {
+            let strength = calculatePasswordStrength(password);
+
+            $("#password-strength").val(strength);
+            $("#password-strength-text").text(`${strength}%`);
+        }
+
+        function storeCredentials() {
+            let label = document.getElementById('label').value;
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+
+            if (label && username && password && currentCategory) {
+                // Hide the "Store Credentials" section
+                $(".input-container").addClass("hidden");
+
+                // Show the password strength menu
+                showPasswordStrengthMenu();
+
+                // Update the password strength indicator
+                updatePasswordStrength(password);
+
+                // Update the password strength feedback
+                let strengthFeedback = "";
+                if (calculatePasswordStrength(password) >= 50) {
+                    strengthFeedback = "Strong";
+                } else {
+                    strengthFeedback = "Weak";
+                }
+                document.getElementById('password-strength-feedback').innerText = strengthFeedback;
+
+                // Make AJAX request to store credentials with category
+                $.ajax({
+                    type: 'POST',
+                    url: 'backend.php',
+                    data: { action: 'storeCredentials', category: currentCategory, label: label, username: username, password: password },
+                    success: function (response) {
+                        if (response === 'success') {
+                            alert(`Credentials for ${label} stored successfully in ${currentCategory} category.`);
+                        } else {
+                            alert('Storage failed. Please try again.');
+                        }
+                    }
+                });
+            } else {
+                alert('Invalid input. Please try again.');
+            }
+        }
+
+        function viewAllCredentials() {
+            $("#input_cont").hide();
+            hidePasswordStrengthMenu();
+            hideStoreSection();
+            if (currentCategory) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'backend.php',
+                    data: { action: 'getAllCredentials', category: currentCategory },
+                    dataType: 'json',
+                    success: function (credentials) {
+                        let credentialsList = `<h3>All ${currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1)} Credentials</h3>`;
+
+                        credentials.forEach(function (credential) {
+                            credentialsList += `
+                                <div>
+                                    <strong>Label:</strong> ${credential.label}<br>
+                                    <strong>Username:</strong> ${credential.username}<br>
+                                    <strong>Password:</strong> ${credential.password}<br>
+                                    -----------------------------
+                                </div>
+                            `;
+                        });
+
+                        // Display the credentials in the right column
+                        $(".output-container").html(credentialsList);
+
+                        // Hide the "Store Credentials" section
+                        $(".input-container").addClass("hidden");
+                    }
+                });
+            }
+        }
+
+        function logout() {
+            // Make AJAX request to logout
+            $.ajax({
+                type: 'POST',
+                url: 'backend.php',
+                data: { action: 'logout' },
+                success: function (response) {
+                    if (response === 'success') {
+                        alert('Logout successful! Redirecting to login page.');
+                        window.location.href = 'login.html'; // Redirect to the login page
+                    }
+                }
+            });
+        }
+
+        // Attach the keyup event to the password input for real-time feedback
+        $(document).ready(function () {
+            $("#password").on("keyup", function () {
+                let password = $(this).val();
+                updatePasswordStrength(password);
+            });
+        });
+    </script>
+
+</body>
+
+</html>
